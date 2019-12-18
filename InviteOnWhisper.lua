@@ -14,7 +14,7 @@ local nameAndVersion = "InviteOnWhisper v"..GetAddOnMetadata("InviteOnWhisper", 
 local IOWmsgPrefix = "<InviteOnWhisper> "
 
 local GuildInvite = GuildInvite
-local InviteUnit = InviteUnit
+local InviteUnit = C_PartyInfo.InviteUnit
 local print = print
 local BNGetFriendInfoByID = BNGetFriendInfoByID
 local lower = lower
@@ -58,6 +58,9 @@ function IOW:ADDON_LOADED(addonName)
     end
     if IOWDB.confirm == nil then
         IOWDB.confirm = true
+    end
+    if IOWDB.keywordMatchMiddle == nil then
+        IOWDB.keywordMatchMiddle = true
     end
     
     StaticPopupDialogs["IOWguildinvPopup"] = {
@@ -114,13 +117,13 @@ end
 _M.process_msg = function(msg,charname)
     msg = msg:lower():trim()
     if IOWDB.ginv[msg] then
-       local dialog = StaticPopup_Show("IOWguildinvPopup", charname)
+        local dialog = StaticPopup_Show("IOWguildinvPopup", charname)
         if (dialog) then
             dialog.data = charname
         end
     elseif IOWDB.inv[msg] then
         if(IOWDB.confirm) then
-           local dialog = StaticPopup_Show("IOWgroupinvPopup", charname)
+            local dialog = StaticPopup_Show("IOWgroupinvPopup", charname)
             if (dialog) then
                 dialog.data = charname
             end
@@ -130,8 +133,40 @@ _M.process_msg = function(msg,charname)
             InviteUnit(charname)
         end
     end
+    if IOWDB.keywordMatchMiddle then
+        local found = false
+        msg = ' ' .. msg .. ' '
+        -- wrapping msg around spaces, so that it starts and ends with a non alphabetical letter
+        for phrase in pairs(IOWDB.ginv) do
+            if msg:find('[^A-z]' .. phrase:lower():trim() .. '[^A-z]') then
+                local dialog = StaticPopup_Show("IOWguildinvPopup", charname)
+                if (dialog) then
+                    found = true
+                    dialog.data = charname
+                end
+                break
+            end
+        end
+        if not found then
+            for phrase in pairs(IOWDB.inv) do
+                if msg:find('[^A-z]' .. phrase:lower():trim() .. '[^A-z]') then
+                    local dialog = StaticPopup_Show("IOWgroupinvPopup", charname)
+                    if (dialog) then
+                        found = true
+                        dialog.data = charname
+                    end
+                    break
+                end
+            end
+        end
+        if found then
+            print(IOWmsgPrefix .. "an invite keyword was found in the whisper you received. Type \"/iow toggleSmartMatch\" if you don't want long whispers to trigger an invite.")
+            if(not IOWDB.confirm) then
+                print(IOWmsgPrefix .. "The confirmation dialog cannot be disabled when Smart Match got triggered")
+            end
+        end
+    end
 end
-
 
 _M.printInfo = function(subject)
     print(nameAndVersion)
@@ -151,8 +186,10 @@ _M.alterList = function(invtype, keyword, add)
     if (syntaxerror) then
         if (add) then
             print(IOWmsgPrefix .. "Incorrect usage; correct ussage is: /iow add [inv || ginv] [*new keyword*]")
+            print(IOWmsgPrefix .. "Example, to invite someone when they whisper you 'hi': /iow add inv hi")
         else
             print(IOWmsgPrefix .. "Incorrect usage; correct ussage is: /iow remove [inv || ginv] [*new keyword*]")
+            print(IOWmsgPrefix .. "Example, to guildinvite someone when they whisper you 'hi': /iow add ginv hi")
         end
         return
     end
@@ -185,8 +222,14 @@ SlashCmdList["IOW"] =
             else
                 print(IOWmsgPrefix .. "confirmation for group invites is now turned OFF")
             end
+        elseif(a1 == "togglesmartmatch") then
+            IOWDB.keywordMatchMiddle = (not IOWDB.keywordMatchMiddle)
+            print(IOWmsgPrefix .. "smart match will search your received whispers for an invite keyword. the 'invite' keyword would then be triggered from \"Could you send me an invite please?\"")
+            if(IOWDB.keywordMatchMiddle) then
+                print(IOWmsgPrefix .. "smart match is now turned ON")
+            else
+                print(IOWmsgPrefix .. "smart match is now turned OFF")
+            end
         end
     end   
-
-
 
