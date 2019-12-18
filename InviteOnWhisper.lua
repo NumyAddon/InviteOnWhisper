@@ -16,7 +16,7 @@ local IOWmsgPrefix = "<InviteOnWhisper> "
 local GuildInvite = GuildInvite
 local InviteUnit = C_PartyInfo.InviteUnit
 local print = print
-local BNGetFriendInfoByID = BNGetFriendInfoByID
+local GetAccountInfoByID = C_BattleNet.GetAccountInfoByID
 local lower = lower
 local trim = trim
 local strlower = strlower
@@ -101,8 +101,11 @@ function IOW:ADDON_LOADED(addonName)
 end
 
 function IOW:CHAT_MSG_BN_WHISPER(msg, _, _, _, _, _, _, _, _, _, _, _, bnetIDAccount,_)
-    local _, _, _, _, charname, _ = BNGetFriendInfoByID(bnetIDAccount)
-    _M.process_msg(msg, charname)
+    local accountInfo = GetAccountInfoByID(bnetIDAccount)
+    if(accountInfo.gameAccountInfo and accountInfo.gameAccountInfo.characterName and accountInfo.gameAccountInfo.realmName) then
+        local charname = accountInfo.gameAccountInfo.characterName .. '-' .. accountInfo.gameAccountInfo.realmName
+        _M.process_msg(msg, charname)
+    end
 end
 
 function IOW:CHAT_MSG_WHISPER(msg,charname,_)
