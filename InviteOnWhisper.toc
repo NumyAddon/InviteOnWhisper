@@ -2,7 +2,7 @@
 ## Title: InviteOnWhisper
 ## Notes: Automatically invite people (to group or guild) who whisper you
 ## Author: Numy
-## Version: 1.3.1
+## Version: @project-version@
 ## SavedVariables:IOWDB
 ## X-License: GNU General Public License version 3 (GPLv3)
 
