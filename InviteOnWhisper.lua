@@ -1,4 +1,4 @@
-IOWDB= {
+IOWDB= { -- the defaults
 	ginv = {
         ginv = true,
         guildinv = true,
@@ -8,7 +8,10 @@ IOWDB= {
         inv = true,
         invite = true
     },
-    confirm = true
+    confirm = true,
+    keywordMatchMiddle = true,
+    triggerOutgoingGInv = true,
+    triggerOutgoingInv = false,
 }
 local nameAndVersion = "InviteOnWhisper v"..GetAddOnMetadata("InviteOnWhisper", "Version")
 local IOWmsgPrefix = "<InviteOnWhisper> "
@@ -37,7 +40,9 @@ end
 IOW:SetScript("OnEvent", OnEvent)
 IOW:RegisterEvent("ADDON_LOADED")
 IOW:RegisterEvent("CHAT_MSG_BN_WHISPER")
+IOW:RegisterEvent("CHAT_MSG_BN_WHISPER_INFORM")
 IOW:RegisterEvent("CHAT_MSG_WHISPER")
+IOW:RegisterEvent("CHAT_MSG_WHISPER_INFORM")
 --IOW:RegisterEvent("CHAT_MSG_GUILD")
 
 function IOW:ADDON_LOADED(addonName)
@@ -61,6 +66,12 @@ function IOW:ADDON_LOADED(addonName)
     end
     if IOWDB.keywordMatchMiddle == nil then
         IOWDB.keywordMatchMiddle = true
+    end
+    if IOWDB.triggerOutgoingGInv == nil then
+        IOWDB.triggerOutgoingGInv = true
+    end
+    if IOWDB.triggerOutgoingInv == nil then
+        IOWDB.triggerOutgoingInv = false
     end
     
     StaticPopupDialogs["IOWguildinvPopup"] = {
@@ -100,31 +111,46 @@ function IOW:ADDON_LOADED(addonName)
     self:UnregisterEvent("ADDON_LOADED")
 end
 
-function IOW:CHAT_MSG_BN_WHISPER(msg, _, _, _, _, _, _, _, _, _, _, _, bnetIDAccount,_)
-    local accountInfo = GetAccountInfoByID(bnetIDAccount)
-    if(accountInfo.gameAccountInfo and accountInfo.gameAccountInfo.characterName and accountInfo.gameAccountInfo.realmName) then
-        local charname = accountInfo.gameAccountInfo.characterName .. '-' .. accountInfo.gameAccountInfo.realmName
-        _M.process_msg(msg, charname)
-    end
+function IOW:CHAT_MSG_BN_WHISPER(msg, _, _, _, _, _, _, _, _, _, _, _, bnetIDAccount, _)
+    _M.handleBnetWhisper(msg, bnetIDAccount, false)
 end
 
-function IOW:CHAT_MSG_WHISPER(msg,charname,_)
-    _M.process_msg(msg,charname)
+function IOW:CHAT_MSG_BN_WHISPER_INFORM(msg, _, _, _, _, _, _, _, _, _, _, _, bnetIDAccount, _)
+    _M.handleBnetWhisper(msg, bnetIDAccount, true)
 end
 
-function IOW:CHAT_MSG_GUILD(msg,charname,_)
+function IOW:CHAT_MSG_WHISPER(msg, charname, _)
+    _M.handleWhisper(msg, charname, false)
+end
+
+function IOW:CHAT_MSG_WHISPER_INFORM(msg, charname, _)
+    _M.handleWhisper(msg, charname, true)
+end
+
+function IOW:CHAT_MSG_GUILD(msg, charname, _)
     return
 end
 
+_M.handleWhisper = function(msg, charname, outgoing)
+    _M.process_msg(msg, charname, outgoing)
+end
 
-_M.process_msg = function(msg,charname)
+_M.handleBnetWhisper = function(msg, bnetIDAccount, outgoing)
+    local accountInfo = GetAccountInfoByID(bnetIDAccount)
+    if(accountInfo.gameAccountInfo and accountInfo.gameAccountInfo.characterName and accountInfo.gameAccountInfo.realmName) then
+        local charname = accountInfo.gameAccountInfo.characterName .. '-' .. accountInfo.gameAccountInfo.realmName
+        _M.process_msg(msg, charname, outgoing)
+    end
+end
+
+_M.process_msg = function(msg, charname, outgoing)
     msg = msg:lower():trim()
-    if IOWDB.ginv[msg] then
+    if IOWDB.ginv[msg] and (not outgoing or IOWDB.triggerOutgoingGInv) then
         local dialog = StaticPopup_Show("IOWguildinvPopup", charname)
         if (dialog) then
             dialog.data = charname
         end
-    elseif IOWDB.inv[msg] then
+    elseif IOWDB.inv[msg] and (not outgoing or IOWDB.triggerOutgoingInv) then
         if(IOWDB.confirm) then
             local dialog = StaticPopup_Show("IOWgroupinvPopup", charname)
             if (dialog) then
@@ -141,7 +167,7 @@ _M.process_msg = function(msg,charname)
         msg = ' ' .. msg .. ' '
         -- wrapping msg around spaces, so that it starts and ends with a non alphabetical letter
         for phrase in pairs(IOWDB.ginv) do
-            if msg:find('[^A-z]' .. phrase:lower():trim() .. '[^A-z]') then
+            if (not outgoing) and msg:find('[^A-z]' .. phrase:lower():trim() .. '[^A-z]') then
                 local dialog = StaticPopup_Show("IOWguildinvPopup", charname)
                 if (dialog) then
                     found = true
@@ -152,7 +178,7 @@ _M.process_msg = function(msg,charname)
         end
         if not found then
             for phrase in pairs(IOWDB.inv) do
-                if msg:find('[^A-z]' .. phrase:lower():trim() .. '[^A-z]') then
+                if (not outgoing) and msg:find('[^A-z]' .. phrase:lower():trim() .. '[^A-z]') then
                     local dialog = StaticPopup_Show("IOWgroupinvPopup", charname)
                     if (dialog) then
                         found = true
@@ -225,6 +251,22 @@ SlashCmdList["IOW"] =
             else
                 print(IOWmsgPrefix .. "confirmation for group invites is now turned OFF")
             end
+        elseif(a1 == "toggleoutgoingtrigger") then
+            if a2 == 'ginv' then
+                IOWDB.triggerOutgoingGInv = (not IOWDB.triggerOutgoingGInv)
+                if(IOWDB.triggerOutgoingGInv) then
+                    print(IOWmsgPrefix .. "triggering from outgoing whispers for guild invite is now turned ON")
+                else
+                    print(IOWmsgPrefix .. "triggering from outgoing whispers for guild invite is now turned OFF")
+                end
+            else
+                IOWDB.triggerOutgoingInv = (not IOWDB.triggerOutgoingInv)
+                if(IOWDB.triggerOutgoingInv) then
+                    print(IOWmsgPrefix .. "triggering from outgoing whispers for group invite is now turned ON")
+                else
+                    print(IOWmsgPrefix .. "triggering from outgoing whispers for group invite is now turned OFF")
+                end
+            end
         elseif(a1 == "togglesmartmatch") then
             IOWDB.keywordMatchMiddle = (not IOWDB.keywordMatchMiddle)
             print(IOWmsgPrefix .. "smart match will search your received whispers for an invite keyword. the 'invite' keyword would then be triggered from \"Could you send me an invite please?\"")
@@ -235,4 +277,3 @@ SlashCmdList["IOW"] =
             end
         end
     end   
-
