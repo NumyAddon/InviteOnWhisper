@@ -3,7 +3,7 @@ when enabled, any whisper containing one of the invite keywords, will trigger an
 the keywords must be a separate word, for example, "inviteme please" would not trigger the "invite" or "inv" keywords; but would trigger "inviteme"
 
 added support for triggering on outgoing whispers:
-when enabled, sending a trigger word to someone will invite/guildinvite them. invite and guildinvite can be enabled/disabled separately
+when enabled, sending a trigger word to someone will invite/guildinvite them. invite and guildinvite can be enabled/disabled separately. smart match does not work for outgoing whispers
 
 type "/iow toggleSmartMatch" to enable/disable smart match
 type "/iow toggleOutgoingTrigger ginv" or "/iow toggleOutgoingTrigger inv" to enable/disable triggering from outgoing whispers
