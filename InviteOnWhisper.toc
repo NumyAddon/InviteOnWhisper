@@ -1,4 +1,4 @@
-## Interface: 80205
+## Interface: 80300
 ## Title: InviteOnWhisper
 ## Notes: Automatically invite people (to group or guild) who whisper you
 ## Author: Numy
