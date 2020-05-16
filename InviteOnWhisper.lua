@@ -150,6 +150,7 @@ _M.process_msg = function(msg, charname, outgoing)
         if (dialog) then
             dialog.data = charname
         end
+        return
     elseif IOWDB.inv[msg] and (not outgoing or IOWDB.triggerOutgoingInv) then
         if(IOWDB.confirm) then
             local dialog = StaticPopup_Show("IOWgroupinvPopup", charname)
@@ -161,6 +162,7 @@ _M.process_msg = function(msg, charname, outgoing)
             print(IOWmsgPrefix .. "Type '/iow toggleconfirm' to ask for confirmation before inviting")
             InviteUnit(charname)
         end
+        return
     end
     if IOWDB.keywordMatchMiddle then
         local found = false
