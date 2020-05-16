@@ -1,1 +1,1 @@
-toc bump
+the confirmation popup no longer shows up after automatically inviting a player when confirmation is disabled
