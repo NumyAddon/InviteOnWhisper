@@ -13,7 +13,7 @@ IOWDB= { -- the defaults
     triggerOutgoingGInv = true,
     triggerOutgoingInv = false,
 }
-local nameAndVersion = "InviteOnWhisper v"..GetAddOnMetadata("InviteOnWhisper", "Version")
+local nameAndVersion = "InviteOnWhisper "..GetAddOnMetadata("InviteOnWhisper", "Version")
 local IOWmsgPrefix = "<InviteOnWhisper> "
 
 local GuildInvite = GuildInvite
