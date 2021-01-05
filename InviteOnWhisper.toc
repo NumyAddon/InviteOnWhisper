@@ -3,10 +3,9 @@
 ## Notes: Automatically invite people (to group or guild) who whisper you
 ## Author: Numy
 ## Version: @project-version@
-## SavedVariables:IOWDB
-## X-License: GNU General Public License version 3 (GPLv3)
+## SavedVariables: IOWDB
 
-## LoadManagers: AddonLoader
-## X-LoadOn-Always: true
+Libs\embeds.xml
 
 InviteOnWhisper.lua
+Config.lua
