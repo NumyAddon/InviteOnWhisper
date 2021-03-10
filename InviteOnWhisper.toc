@@ -1,4 +1,4 @@
-## Interface: 90002
+## Interface: 90005
 ## Title: InviteOnWhisper
 ## Notes: Automatically invite people (to group or guild) who whisper you
 ## Author: Numy
