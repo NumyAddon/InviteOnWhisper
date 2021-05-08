@@ -11,7 +11,7 @@ jobs:
 
     env:
       CF_API_KEY: ${{ secrets.CF_API_KEY }}
-      GITHUB_OAUTH: ${{ secrets.GITHUB_OAUTH }}
+      GITHUB_OAUTH: ${{ secrets.GH_OAUTH }}
 
     steps:
       - uses: actions/checkout@v2
