@@ -3,8 +3,10 @@ local _G = getfenv(0)
 local LibStub = _G.LibStub
 local pairs = _G.pairs
 local GuildInvite = _G.GuildInvite
-local C_PartyInfo = _G.C_PartyInfo
+local InviteUnit = _G.C_PartyInfo.InviteUnit or _G.InviteUnit
 local C_BattleNet = _G.C_BattleNet
+local BNGetFriendInfoByID = _G.BNGetFriendInfoByID
+local BNGetGameAccountInfo = _G.BNGetGameAccountInfo
 local StaticPopupDialogs = _G.StaticPopupDialogs
 local StaticPopup_Show = _G.StaticPopup_Show
 
@@ -54,7 +56,7 @@ function IOW:OnInitialize()
         button1 = "Yes",
         button2 = "No",
         OnAccept = function(_, characterName)
-            C_PartyInfo.InviteUnit(characterName)
+            InviteUnit(characterName)
         end,
         OnCancel = function() end,
         timeout = 0,
@@ -92,11 +94,26 @@ function IOW:HandleWhisper(message, characterName, outgoing)
     self:ProcessMessage(message, characterName, outgoing)
 end
 
-function IOW:HandleBnetWhisper(message, bnetIDAccount, outgoing)
-    local accountInfo = C_BattleNet.GetAccountInfoByID(bnetIDAccount)
-    if(accountInfo.gameAccountInfo and accountInfo.gameAccountInfo.characterName and accountInfo.gameAccountInfo.realmName) then
-        local characterName = accountInfo.gameAccountInfo.characterName .. '-' .. accountInfo.gameAccountInfo.realmName
-        self:ProcessMessage(message, characterName, outgoing)
+function IOW:GetCharacterNameFromPresenceID(presenceID)
+    if(C_BattleNet and C_BattleNet.GetAccountInfoByID) then
+        -- retail
+        local accountInfo = C_BattleNet.GetAccountInfoByID(presenceID);
+        if(accountInfo.gameAccountInfo and accountInfo.gameAccountInfo.characterName and accountInfo.gameAccountInfo.realmName) then
+            return accountInfo.gameAccountInfo.characterName .. '-' .. accountInfo.gameAccountInfo.realmName;
+        end
+    elseif(BNGetFriendInfoByID and BNGetGameAccountInfo) then
+        -- classic
+        local _, _, _, _, _, bnetIDGameAccount, _ = BNGetFriendInfoByID(presenceID);
+        local _, characterName, _, realmName, _  = BNGetGameAccountInfo(bnetIDGameAccount);
+        return characterName .. '-' .. realmName;
+    end
+    return nil;
+end
+
+function IOW:HandleBnetWhisper(message, presenceID, outgoing)
+    local characterName = self:GetCharacterNameFromPresenceID(presenceID);
+    if(characterName) then
+        self:ProcessMessage(message, characterName, outgoing);
     end
 end
 
@@ -116,7 +133,7 @@ function IOW:ProcessMessage(message, characterName, outgoing)
             end
         else
             self:Print("Trying to invite" .. characterName .." to your party/raid")
-            C_PartyInfo.InviteUnit(characterName)
+            InviteUnit(characterName)
         end
         return
     end
