@@ -9,10 +9,6 @@ jobs:
 
     runs-on: ubuntu-latest
 
-    env:
-      CF_API_KEY: ${{ secrets.CF_API_KEY }}
-      GITHUB_OAUTH: ${{ secrets.GH_OAUTH }}
-
     steps:
       - uses: actions/checkout@v2
 
@@ -21,3 +17,22 @@ jobs:
 
       - name: Create Retail Package
         uses: BigWigsMods/packager@master
+        env:
+          CF_API_KEY: ${{ secrets.CF_API_KEY }}
+          GITHUB_OAUTH: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create Classic Package
+        uses: BigWigsMods/packager@master
+        with:
+          args: -g classic
+        env:
+          CF_API_KEY: ${{ secrets.CF_API_KEY }}
+          GITHUB_OAUTH: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create Burning Crusade Package
+        uses: BigWigsMods/packager@master
+        with:
+          args: -g bcc
+        env:
+          CF_API_KEY: ${{ secrets.CF_API_KEY }}
+          GITHUB_OAUTH: ${{ secrets.GITHUB_TOKEN }}
