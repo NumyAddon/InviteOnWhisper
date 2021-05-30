@@ -15,6 +15,9 @@ jobs:
       - name: Replace toc-versions
         uses: Numynum/ToCVersions@master
 
+      - name: Create version specific ToC files
+        uses: Numynum/ToCDuplicator@master
+
       - name: Create Retail Package
         uses: BigWigsMods/packager@master
         env:
