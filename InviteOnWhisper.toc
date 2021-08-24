@@ -8,6 +8,7 @@
 ## Version: @project-version@
 ## SavedVariables: IOWDB
 ## X-Curse-Project-ID: 280284
+## X-Wago-ID: PANz22N4
 
 Libs\embeds.xml
 
