@@ -6,6 +6,7 @@
 ## Title: InviteOnWhisper
 ## Notes: Automatically invite people (to group or guild) who whisper you
 ## Author: Numy
+## IconTexture: 982414
 ## Version: @project-version@
 ## SavedVariables: IOWDB
 ## X-Curse-Project-ID: 280284
