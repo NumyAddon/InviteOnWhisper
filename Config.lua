@@ -1,7 +1,7 @@
 -- upvalue the globals
 local _G = getfenv(0)
 local LibStub = _G.LibStub
-local GetAddOnMetadata = _G.GetAddOnMetadata
+local GetAddOnMetadata = _G.GetAddOnMetadata or C_AddOns.GetAddOnMetadata
 local InterfaceOptionsFrame_OpenToCategory = _G.InterfaceOptionsFrame_OpenToCategory
 local coroutine = _G.coroutine
 
