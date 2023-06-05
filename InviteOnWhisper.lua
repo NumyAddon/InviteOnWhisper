@@ -132,7 +132,7 @@ function IOW:ProcessMessage(message, characterName, outgoing)
                 dialog.data = characterName
             end
         else
-            self:Print("Trying to invite" .. characterName .." to your party/raid")
+            self:Print("Trying to invite " .. characterName .. " to your party/raid")
             InviteUnit(characterName)
         end
         return
