@@ -63,7 +63,7 @@ function Config:GetOptions()
             keywordMatchMiddle = {
                 order = orderCount(),
                 name = "Toggle Smart Match",
-                desc = "Smart Match will search your received whispers for an invite keyword. The 'invite' keyword would then be triggered from \"Could you send me an invite please?\"",
+                desc = "Smart Match will search your received whispers for an invite keyword. If any invite keyword is found in the whisper, it will trigger an invite. For example, the 'invite' keyword would then be triggered from \"Invite please?\"",
                 width = "full",
                 type = "toggle",
             },
