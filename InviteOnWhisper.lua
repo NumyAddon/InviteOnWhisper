@@ -5,8 +5,6 @@ local pairs = _G.pairs
 local GuildInvite = _G.GuildInvite
 local InviteUnit = _G.C_PartyInfo.InviteUnit or _G.InviteUnit
 local C_BattleNet = _G.C_BattleNet
-local BNGetFriendInfoByID = _G.BNGetFriendInfoByID
-local BNGetGameAccountInfo = _G.BNGetGameAccountInfo
 local StaticPopupDialogs = _G.StaticPopupDialogs
 local StaticPopup_Show = _G.StaticPopup_Show
 
@@ -95,18 +93,11 @@ function IOW:HandleWhisper(message, characterName, outgoing)
 end
 
 function IOW:GetCharacterNameFromPresenceID(presenceID)
-    if(C_BattleNet and C_BattleNet.GetAccountInfoByID) then
-        -- retail
-        local accountInfo = C_BattleNet.GetAccountInfoByID(presenceID);
-        if(accountInfo.gameAccountInfo and accountInfo.gameAccountInfo.characterName and accountInfo.gameAccountInfo.realmName) then
-            return accountInfo.gameAccountInfo.characterName .. '-' .. accountInfo.gameAccountInfo.realmName;
-        end
-    elseif(BNGetFriendInfoByID and BNGetGameAccountInfo) then
-        -- classic
-        local _, _, _, _, _, bnetIDGameAccount, _ = BNGetFriendInfoByID(presenceID);
-        local _, characterName, _, realmName, _  = BNGetGameAccountInfo(bnetIDGameAccount);
-        return characterName .. '-' .. realmName;
+    local accountInfo = C_BattleNet.GetAccountInfoByID(presenceID);
+    if(accountInfo.gameAccountInfo and accountInfo.gameAccountInfo.characterName and accountInfo.gameAccountInfo.realmName) then
+        return accountInfo.gameAccountInfo.characterName .. '-' .. accountInfo.gameAccountInfo.realmName;
     end
+
     return nil;
 end
 
