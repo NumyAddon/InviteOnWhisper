@@ -2,7 +2,6 @@
 local _G = getfenv(0)
 local LibStub = _G.LibStub
 local GetAddOnMetadata = _G.GetAddOnMetadata or C_AddOns.GetAddOnMetadata
-local InterfaceOptionsFrame_OpenToCategory = _G.InterfaceOptionsFrame_OpenToCategory
 local coroutine = _G.coroutine
 
 local addonName = ...
@@ -137,9 +136,7 @@ function Config:RegisterOptions()
 end
 
 function Config:OpenConfig()
-    -- after a reload, you need to open to category twice to actually open the correct page
-    InterfaceOptionsFrame_OpenToCategory('Invite On Whisper')
-    InterfaceOptionsFrame_OpenToCategory('Invite On Whisper')
+    Settings.OpenToCategory('Invite On Whisper')
 end
 
 function Config:GetConfig(property)
