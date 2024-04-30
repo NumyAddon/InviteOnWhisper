@@ -3,6 +3,7 @@
 ## Interface-Classic: @toc-version-classic@
 ## Interface-BCC: @toc-version-bcc@
 ## Interface-Wrath: @toc-version-wrath@
+## Interface-Cata: @toc-version-cata@
 ## Title: InviteOnWhisper
 ## Notes: Automatically invite people (to group or guild) who whisper you
 ## Author: Numy
