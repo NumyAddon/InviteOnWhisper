@@ -2,7 +2,7 @@
 local _G = getfenv(0)
 local LibStub = _G.LibStub
 local pairs = _G.pairs
-local GuildInvite = _G.GuildInvite
+local GuildInvite = _G.C_GuildInfo.Invite or _G.GuildInvite
 local InviteUnit = _G.C_PartyInfo.InviteUnit or _G.InviteUnit
 local C_BattleNet = _G.C_BattleNet
 local StaticPopupDialogs = _G.StaticPopupDialogs
@@ -13,9 +13,8 @@ local addonName = ...
 local IOW = LibStub('AceAddon-3.0'):NewAddon(addonName, 'AceConsole-3.0', 'AceHook-3.0', 'AceEvent-3.0');
 if not IOW then return end
 
-IOWDB = IOWDB or {}
-
 function IOW:OnInitialize()
+    IOWDB = IOWDB or {}
     self.DB = IOWDB
     self:InitDefaults()
 
