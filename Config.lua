@@ -1,44 +1,29 @@
--- upvalue the globals
-local _G = getfenv(0)
-local LibStub = _G.LibStub
-local GetAddOnMetadata = _G.GetAddOnMetadata or C_AddOns.GetAddOnMetadata
-local coroutine = _G.coroutine
-
 local addonName = ...
-local IOW = LibStub("AceAddon-3.0"):GetAddon(addonName);
+
+---@class (partial) InviteOnWhisper
+local IOW = LibStub("AceAddon-3.0"):GetAddon(addonName)
 if not IOW then return end
 
-IOW.Config = IOW.Config or {}
-local Config = IOW.Config
+local Config = {}
+IOW.Config = Config
 
-Config.version = GetAddOnMetadata(addonName, "Version") or ""
-
-local function getCounter(start, increment)
-    start = start or 1
-    increment = increment or 1
-    return coroutine.wrap(function()
-        local count = start
-        while true do
-            count = count + increment
-            coroutine.yield(count)
-        end
-    end)
-end
+Config.version = C_AddOns.GetAddOnMetadata(addonName, "Version") or ""
+Config.name = "Invite On Whisper";
 
 function Config:GetOptions()
-    local orderCount = getCounter()
+    local increment = CreateCounter()
     local options = {
         type = 'group',
-        get = function(info) return Config:GetConfig(info[#info]); end,
-        set = function(info, value) return Config:SetConfig(info[#info], value); end,
+        get = function(info) return self:GetConfig(info[#info]) end,
+        set = function(info, value) return self:SetConfig(info[#info], value) end,
         args = {
             version = {
-                order = orderCount(),
+                order = increment(),
                 type = "description",
                 name = "Version: " .. self.version
             },
             confirm = {
-                order = orderCount(),
+                order = increment(),
                 name = "Confirmation",
                 desc = "Asks for confirmation for group invites",
                 descStyle = 'inline',
@@ -46,28 +31,28 @@ function Config:GetOptions()
                 type = "toggle",
             },
             triggerOutgoingGInv = {
-                order = orderCount(),
+                order = increment(),
                 name = "Trigger on outgoing whispers for Guild invites",
                 descStyle = 'inline',
                 width = "full",
                 type = "toggle",
             },
             triggerOutgoingInv = {
-                order = orderCount(),
+                order = increment(),
                 name = "Trigger on outgoing whispers for Group invites",
                 descStyle = 'inline',
                 width = "full",
                 type = "toggle",
             },
             keywordMatchMiddle = {
-                order = orderCount(),
+                order = increment(),
                 name = "Toggle Smart Match",
                 desc = "Smart Match will search your received whispers for an invite keyword. If any invite keyword is found in the whisper, it will trigger an invite. For example, the 'invite' keyword would then be triggered from \"Invite please?\"",
                 width = "full",
                 type = "toggle",
             },
             addGuildInviteTrigger = {
-                order = orderCount(),
+                order = increment(),
                 type = "input",
                 name = "Add Guild invite trigger phrase",
                 set = function(_, phrase)
@@ -75,7 +60,7 @@ function Config:GetOptions()
                 end,
             },
             removeGuildInviteTrigger = {
-                order = orderCount(),
+                order = increment(),
                 type = "select",
                 style = "dropdown",
                 name = "Remove Guild invite trigger phrase",
@@ -88,13 +73,13 @@ function Config:GetOptions()
                     end
                     return tempTable
                 end,
-                get = function(_, _) return false end,
-                set = function(_, phrase, ...)
+                get = function() return false end,
+                set = function(_, phrase)
                     IOW.DB.ginv[phrase] = nil
                 end,
             },
             addGroupInviteTrigger = {
-                order = orderCount(),
+                order = increment(),
                 type = "input",
                 name = "Add Group invite trigger phrase",
                 set = function(_, phrase)
@@ -102,7 +87,7 @@ function Config:GetOptions()
                 end,
             },
             removeGroupInviteTrigger = {
-                order = orderCount(),
+                order = increment(),
                 type = "select",
                 style = "dropdown",
                 name = "Remove Group invite trigger phrase",
@@ -115,7 +100,7 @@ function Config:GetOptions()
                     end
                     return tempTable
                 end,
-                get = function(_, _) return false end,
+                get = function() return false end,
                 set = function(_, phrase, ...)
                     IOW.DB.inv[phrase] = nil
                 end,
@@ -128,19 +113,19 @@ end
 
 function Config:Initialize()
     self:RegisterOptions()
-    LibStub("AceConfigDialog-3.0"):AddToBlizOptions("Invite On Whisper", "Invite On Whisper")
+    LibStub("AceConfigDialog-3.0"):AddToBlizOptions(self.name, self.name)
 end
 
 function Config:RegisterOptions()
-    LibStub("AceConfig-3.0"):RegisterOptionsTable("Invite On Whisper", self:GetOptions())
+    LibStub("AceConfig-3.0"):RegisterOptionsTable(self.name, self:GetOptions())
 end
 
 function Config:OpenConfig()
-    Settings.OpenToCategory('Invite On Whisper')
+    Settings.OpenToCategory(self.name)
 end
 
 function Config:GetConfig(property)
-    return IOW.DB[property];
+    return IOW.DB[property]
 end
 
 function Config:SetConfig(property, value)

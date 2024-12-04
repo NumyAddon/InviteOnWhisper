@@ -1,17 +1,7 @@
--- upvalue the globals
-local _G = getfenv(0)
-local LibStub = _G.LibStub
-local pairs = _G.pairs
-local GuildInvite = _G.C_GuildInfo.Invite or _G.GuildInvite
-local InviteUnit = _G.C_PartyInfo.InviteUnit or _G.InviteUnit
-local C_BattleNet = _G.C_BattleNet
-local StaticPopupDialogs = _G.StaticPopupDialogs
-local StaticPopup_Show = _G.StaticPopup_Show
-
 local addonName = ...
 
-local IOW = LibStub('AceAddon-3.0'):NewAddon(addonName, 'AceConsole-3.0', 'AceHook-3.0', 'AceEvent-3.0');
-if not IOW then return end
+---@class InviteOnWhisper: AceAddon, AceConsole-3.0, AceHook-3.0, AceEvent-3.0
+local IOW = LibStub('AceAddon-3.0'):NewAddon(addonName, 'AceConsole-3.0', 'AceHook-3.0', 'AceEvent-3.0')
 
 function IOW:OnInitialize()
     IOWDB = IOWDB or {}
@@ -39,7 +29,7 @@ function IOW:OnInitialize()
         button1 = "Yes",
         button2 = "No",
         OnAccept = function(_, characterName)
-            GuildInvite(characterName)
+            C_GuildInfo.Invite(characterName)
         end,
         OnCancel = function() end,
         timeout = 0,
@@ -52,8 +42,12 @@ function IOW:OnInitialize()
         text = "Do you want to invite %s to your party/raid?",
         button1 = "Yes",
         button2 = "No",
-        OnAccept = function(_, characterName)
-            InviteUnit(characterName)
+        OnAccept = function(_, characterNameOrPresenceID)
+            if type(characterNameOrPresenceID) == "number" then
+                BNInviteFriend(characterNameOrPresenceID)
+            else
+                C_PartyInfo.InviteUnit(characterNameOrPresenceID)
+            end
         end,
         OnCancel = function() end,
         timeout = 0,
@@ -93,21 +87,28 @@ end
 
 function IOW:GetCharacterNameFromPresenceID(presenceID)
     local accountInfo = C_BattleNet.GetAccountInfoByID(presenceID);
-    if(accountInfo.gameAccountInfo and accountInfo.gameAccountInfo.characterName and accountInfo.gameAccountInfo.realmName) then
+    if(accountInfo and accountInfo.gameAccountInfo and accountInfo.gameAccountInfo.characterName and accountInfo.gameAccountInfo.realmName) then
         return accountInfo.gameAccountInfo.characterName .. '-' .. accountInfo.gameAccountInfo.realmName;
     end
 
     return nil;
 end
 
+---@param message string
+---@param outgoing boolean
+---@param presenceID number?
 function IOW:HandleBnetWhisper(message, presenceID, outgoing)
     local characterName = self:GetCharacterNameFromPresenceID(presenceID);
     if(characterName) then
-        self:ProcessMessage(message, characterName, outgoing);
+        self:ProcessMessage(message, characterName, outgoing, presenceID);
     end
 end
 
-function IOW:ProcessMessage(message, characterName, outgoing)
+---@param message string
+---@param characterName string
+---@param outgoing boolean
+---@param presenceID number?
+function IOW:ProcessMessage(message, characterName, outgoing, presenceID)
     message = message:lower():trim()
     if self.DB.ginv[message] and (not outgoing or self.DB.triggerOutgoingGInv) then
         local dialog = StaticPopup_Show("IOWguildinvPopup", characterName)
@@ -119,11 +120,15 @@ function IOW:ProcessMessage(message, characterName, outgoing)
         if(self.DB.confirm) then
             local dialog = StaticPopup_Show("IOWgroupinvPopup", characterName)
             if (dialog) then
-                dialog.data = characterName
+                dialog.data = presenceID or characterName
             end
         else
             self:Print("Trying to invite " .. characterName .. " to your party/raid")
-            InviteUnit(characterName)
+            if presenceID then
+                BNInviteFriend(presenceID)
+            else
+                C_PartyInfo.InviteUnit(characterName)
+            end
         end
         return
     end
@@ -149,7 +154,7 @@ function IOW:ProcessMessage(message, characterName, outgoing)
                     local dialog = StaticPopup_Show("IOWgroupinvPopup", characterName)
                     if (dialog) then
                         found = true
-                        dialog.data = characterName
+                        dialog.data = presenceID or characterName
                     end
                     break
                 end
