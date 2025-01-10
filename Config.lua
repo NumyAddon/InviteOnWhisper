@@ -1,26 +1,26 @@
-local addonName = ...
+local addonName = ...;
 
 ---@class (partial) InviteOnWhisper
-local IOW = LibStub("AceAddon-3.0"):GetAddon(addonName)
-if not IOW then return end
+local IOW = LibStub("AceAddon-3.0"):GetAddon(addonName);
+if not IOW then return; end
 
-local Config = {}
-IOW.Config = Config
+local Config = {};
+IOW.Config = Config;
 
 Config.version = C_AddOns.GetAddOnMetadata(addonName, "Version") or ""
 Config.name = "Invite On Whisper";
 
 function Config:GetOptions()
-    local increment = CreateCounter()
+    local increment = CreateCounter();
     local options = {
         type = 'group',
-        get = function(info) return self:GetConfig(info[#info]) end,
-        set = function(info, value) return self:SetConfig(info[#info], value) end,
+        get = function(info) return self:GetConfig(info[#info]); end,
+        set = function(info, value) return self:SetConfig(info[#info], value); end,
         args = {
             version = {
                 order = increment(),
                 type = "description",
-                name = "Version: " .. self.version
+                name = "Version: " .. self.version,
             },
             confirm = {
                 order = increment(),
@@ -56,7 +56,7 @@ function Config:GetOptions()
                 type = "input",
                 name = "Add Guild invite trigger phrase",
                 set = function(_, phrase)
-                    IOW.DB.ginv[phrase:lower()] = true
+                    IOW.DB.ginv[phrase:lower()] = true;
                 end,
             },
             removeGuildInviteTrigger = {
@@ -67,15 +67,16 @@ function Config:GetOptions()
                 desc = "Select a Guild invite trigger phrase to remove it",
                 width = "double",
                 values = function()
-                    local tempTable = {}
+                    local tempTable = {};
                     for phrase, _ in pairs(IOW.DB.ginv) do
-                        tempTable[phrase] = phrase
+                        tempTable[phrase] = phrase;
                     end
-                    return tempTable
+
+                    return tempTable;
                 end,
-                get = function() return false end,
+                get = function() return false; end,
                 set = function(_, phrase)
-                    IOW.DB.ginv[phrase] = nil
+                    IOW.DB.ginv[phrase] = nil;
                 end,
             },
             addGroupInviteTrigger = {
@@ -83,7 +84,7 @@ function Config:GetOptions()
                 type = "input",
                 name = "Add Group invite trigger phrase",
                 set = function(_, phrase)
-                    IOW.DB.inv[phrase:lower()] = true
+                    IOW.DB.inv[phrase:lower()] = true;
                 end,
             },
             removeGroupInviteTrigger = {
@@ -94,38 +95,39 @@ function Config:GetOptions()
                 desc = "Select a Group invite trigger phrase to remove it",
                 width = "double",
                 values = function()
-                    local tempTable = {}
+                    local tempTable = {};
                     for phrase, _ in pairs(IOW.DB.inv) do
-                        tempTable[phrase] = phrase
+                        tempTable[phrase] = phrase;
                     end
-                    return tempTable
+
+                    return tempTable;
                 end,
                 get = function() return false end,
                 set = function(_, phrase, ...)
-                    IOW.DB.inv[phrase] = nil
+                    IOW.DB.inv[phrase] = nil;
                 end,
             },
         },
-    }
+    };
 
-    return options
+    return options;
 end
 
 function Config:Initialize()
-    self:RegisterOptions()
-    LibStub("AceConfigDialog-3.0"):AddToBlizOptions(self.name, self.name)
+    self:RegisterOptions();
+    LibStub("AceConfigDialog-3.0"):AddToBlizOptions(self.name, self.name);
 end
 
 function Config:RegisterOptions()
-    LibStub("AceConfig-3.0"):RegisterOptionsTable(self.name, self:GetOptions())
+    LibStub("AceConfig-3.0"):RegisterOptionsTable(self.name, self:GetOptions());
 end
 
 function Config:OpenConfig()
-    Settings.OpenToCategory(self.name)
+    Settings.OpenToCategory(self.name);
 end
 
 function Config:GetConfig(property)
-    return IOW.DB[property]
+    return IOW.DB[property];
 end
 
 function Config:SetConfig(property, value)
