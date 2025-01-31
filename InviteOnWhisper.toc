@@ -12,6 +12,17 @@
 ## SavedVariables: IOWDB
 ## X-Curse-Project-ID: 280284
 ## X-Wago-ID: PANz22N4
+## Category-enUS: Chat
+## Category-deDE: Chat
+## Category-esES: Chat
+## Category-esMX: Chat
+## Category-frFR: Discussion
+## Category-itIT: Chat
+## Category-koKR: 대화
+## Category-ptBR: Bate-papo
+## Category-ruRU: Чат
+## Category-zhCN: 聊天
+## Category-zhTW: 對話
 
 Libs\embeds.xml
 
