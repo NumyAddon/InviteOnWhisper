@@ -124,6 +124,10 @@ function Config:RegisterOptions()
 end
 
 function Config:OpenConfig()
+    if C_SettingsUtil and C_SettingsUtil.OpenSettingsPanel and InCombatLockdown() then
+        LibStub("AceConfigDialog-3.0"):Open(self.name);
+        return;
+    end
     Settings.OpenToCategory(self.categoryID);
 end
 
