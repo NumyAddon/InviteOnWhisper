@@ -2,8 +2,8 @@ local addonName = ...;
 
 local playerRealm = GetRealmName();
 
----@class InviteOnWhisper: AceAddon, AceConsole-3.0, AceHook-3.0, AceEvent-3.0
-local IOW = LibStub('AceAddon-3.0'):NewAddon(addonName, 'AceConsole-3.0', 'AceHook-3.0', 'AceEvent-3.0');
+---@class InviteOnWhisper: AceAddon, AceConsole-3.0, AceHook-3.0, NumyAceEvent-3.0
+local IOW = LibStub('AceAddon-3.0'):NewAddon(addonName, 'AceConsole-3.0', 'AceHook-3.0', 'NumyAceEvent-3.0');
 
 function IOW:OnInitialize()
     IOWDB = IOWDB or {};
