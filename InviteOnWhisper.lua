@@ -88,6 +88,7 @@ function IOW:HandleWhisper(message, characterName, outgoing)
 end
 
 function IOW:GetCharacterNameFromPresenceID(presenceID)
+    if issecretvalue and issecretvalue(presenceID) then return end
     local accountInfo = C_BattleNet.GetAccountInfoByID(presenceID);
     if accountInfo and accountInfo.gameAccountInfo and accountInfo.gameAccountInfo.characterName and accountInfo.gameAccountInfo.realmName then
         return accountInfo.gameAccountInfo.characterName .. '-' .. accountInfo.gameAccountInfo.realmName;
@@ -109,6 +110,7 @@ end
 ---@param outgoing boolean
 ---@param presenceID number?
 function IOW:ProcessMessage(message, name, outgoing, presenceID)
+    if issecretvalue and issecretvalue(message) then return end
     message = message:lower():trim();
     local characterName, realmName = string.split("-", name, 2);
     if realmName and realmName ~= playerRealm and realmName ~= "" then
