@@ -5,6 +5,8 @@
 ## Title: InviteOnWhisper
 ## Notes: Automatically invite people (to group or guild) who whisper you
 ## Author: Numy
+## X-GameType: [Game]
+## X-GameFamily: [Family]
 ## IconTexture: Interface\Addons\InviteOnWhisper\media\icon
 ## Version: @project-version@
 ## SavedVariables: IOWDB
